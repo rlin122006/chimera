@@ -9,54 +9,63 @@
 // @author      rlin122006
 // ==/UserScript==
 
-(function () {
+(async function () {
     "use strict";
+    while (true) {
+        await new Promise(resolve => setTimeout(resolve, 4000));
 
-    // watches for when the document changes
-    const observer = new MutationObserver(() => {
-      const scripts = document.querySelectorAll("script");
+        const scripts = document.querySelectorAll("script");
 
-      // for each script element find the ones that contain answer
-      for (const script of scripts) {
-          if (script.textContent.includes("\\answer")) {
-              const raw = script.textContent;
-              const answer = extractString(raw);
+        for (const script of scripts) {
+            if (script.textContent.includes("\\answer")) {
+                const raw = script.textContent;
+                const answer = extractString(raw);
 
-              // sets parent object that must also own input that corresponds to the answer
-              const object = script.parentElement;
+                const object = script.parentElement;
 
-              // find input of the object
-              const input = object.querySelector(
-                'input[aria-label="answer"]'
-              );
+                const inputs = object.querySelectorAll(
+                    'input[aria-label="answer"]'
+                );
 
-              if (answer) {
-                input.value = answer;
-              }
-          }
-      }
-    });
+                for (const input of inputs) {ze
+                    if (answer) {
+                        input.value = answer;
 
-    // grab answer string
+                        input.dispatchEvent(new Event("input", {
+                            bubbles: true
+                        }));
+
+                        const button = input.closest(".input-group")
+                            .querySelector(".btn-ximera-submit");
+
+                        const form = button.form;
+
+                        form.addEventListener("submit", event => {
+                            event.preventDefault();
+                        });
+
+                        button.click();
+                    }
+                }
+            }
+        }
+    }
+
+    // grab answers from raw text
     function extractString(raw) {
-        // looks for starting answer in text
         const marker = "\\answer";
         const start = raw.indexOf(marker);
 
-        // exit if not found
         if (start === -1) {
             return null;
         }
 
-        // finds starting open brace
         const openBrace = raw.indexOf("{", start);
 
-        // exit if not found
         if (openBrace === -1) {
             return null;
         }
 
-        // set depth
         let depth = 0;
 
         // loop through all characters
@@ -68,19 +77,11 @@
             } else if (raw[i] === "}") {
                 depth--;
 
-                // when depth reaches 0 extract the text
                 if (depth === 0) {
                     return raw.slice(openBrace + 1, i).trim();
                 }
             }
         }
-
         return null;
     }
-
-    // observe everything
-    observer.observe(document.body, {
-      childList: true,
-      subtree: true
-    });
 })();
