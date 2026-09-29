@@ -8,9 +8,11 @@ Chimera is a tool written in Javascript that identifies input forms and fills th
 
 ## Disclaimer
 
-The functionality of chimera may be illegal, unethical, and in violation of the terms of service of third parties. This software is intended for use only where legal. You confirm you are of legal age in your jurisdiction. You accept full responsibility for any consequences, legal or otherwise, that result from your use of this application.
+The functionality of Chimera may be illegal, unethical, and in violation of the terms of service of third parties. This software is intended for use only where legal. You confirm you are of legal age in your jurisdiction. You accept full responsibility for any consequences, legal or otherwise, that result from your use of this application.
 
-I do not endorse, condone, or encourage any illegal, unethical, or terms-of-service-violating activity. Under no circumstances will I or the project's contributor(s) be liable for any damages, losses, or legal claims arising from your use of this software. Use at your own risk. By using this software, you acknowledge you have read and understood this disclaimer.
+I do not endorse, condone, or encourage any illegal, unethical, or terms-of-service-violating activity. This includes, but is not limited to, cheating, academic dishonesty, piracy, copyright infringement, unauthorized intrusions, cyberstalking, and child exploitation.
+
+Under no circumstances will I or the project's contributor(s) be liable for any damages, losses, or legal claims arising from your use of this software. Use at your own risk. By using this software, you acknowledge you have read and understood this disclaimer.
 
 ## Getting Started
 
