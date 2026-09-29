@@ -11,77 +11,108 @@
 
 (async function () {
     "use strict";
+    await new Promise(resolve => setTimeout(resolve, 4000));
     while (true) {
-        await new Promise(resolve => setTimeout(resolve, 4000));
-
         const scripts = document.querySelectorAll("script");
 
         for (const script of scripts) {
-            if (script.textContent.includes("\\answer")) {
-                const raw = script.textContent;
-                const answer = extractString(raw);
+            if (!script.textContent.includes("\\answer")) {
+                continue;
+            }
 
-                const object = script.parentElement;
+            const object = script.parentElement;
 
-                const inputs = object.querySelectorAll(
-                    'input[aria-label="answer"]'
-                );
+            const inputs = object.querySelectorAll(
+                'input[aria-label="answer"]'
+            );
 
-                for (const input of inputs) {ze
-                    if (answer) {
-                        input.value = answer;
+            const raw = script.textContent;
+            const answers = extractStrings(raw);
 
-                        input.dispatchEvent(new Event("input", {
-                            bubbles: true
-                        }));
+            for (const input of inputs) {
+                if (input.disabled) {
+                    continue;
+                }
 
-                        const button = input.closest(".input-group")
-                            .querySelector(".btn-ximera-submit");
-
-                        const form = button.form;
-
-                        form.addEventListener("submit", event => {
-                            event.preventDefault();
-                        });
-
-                        button.click();
+                for (const answer of answers) {
+                    if (input.disabled) {
+                      break;
                     }
+
+                    if(!answer) {
+                        continue;
+                    }
+
+                    enterAnswer(input, answer)
+                    await submitAnswer(input);
                 }
             }
         }
     }
 
-    // grab answers from raw text
-    function extractString(raw) {
+    // extract answers into an array
+    function extractStrings(raw) {
         const marker = "\\answer";
-        const start = raw.indexOf(marker);
+        const answers = [];
 
-        if (start === -1) {
-            return null;
-        }
+        let searchStart = 0;
 
-        const openBrace = raw.indexOf("{", start);
+        while (true) {
+            const start = raw.indexOf(marker, searchStart);
 
-        if (openBrace === -1) {
-            return null;
-        }
+            if (start === -1) {
+                break;
+            }
 
-        let depth = 0;
+            const openBrace = raw.indexOf("{", start);
 
-        // loop through all characters
-        for (let i = openBrace; i < raw.length; i++) {
-            // if open brace found add to depth
-            if (raw[i] === "{") {
-                depth++;
-              // if close brace found remove depth
-            } else if (raw[i] === "}") {
-                depth--;
+            if (openBrace === -1) {
+                break;
+            }
 
-                if (depth === 0) {
-                    return raw.slice(openBrace + 1, i).trim();
+            let depth = 0;
+
+            // use bracket depth to correctly extract answer
+            for (let i = openBrace; i < raw.length; i++) {
+                if (raw[i] === "{") {
+                    depth++;
+                } else if (raw[i] === "}") {
+                    depth--;
+
+                    if (depth === 0) {
+                        answers.push(
+                            raw.slice(openBrace + 1, i).trim()
+                        );
+
+                        searchStart = i + 1;
+                        break;
+                    }
                 }
             }
         }
-        return null;
+        return answers;
+    }
+
+    // put answer into input
+    function enterAnswer(element, answer) {
+        element.value = answer;
+        // tell webpage input was updated
+        element.dispatchEvent(new Event("input", {
+            bubbles: true
+        }));
+    }
+
+    // hit answer button and allow webpage to register
+    async function submitAnswer(element) {
+        const button = element.closest(".input-group")
+            .querySelector(".btn-ximera-submit");
+        const form = button.form;
+
+        form.addEventListener("submit", event => {
+            event.preventDefault();
+        });
+
+        button.click();
+        await new Promise(resolve => setTimeout(resolve, 2000));
     }
 })();
