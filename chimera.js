@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name        orthrus
+// @name        chimera
 // @namespace   Violentmonkey Scripts
 // @version     1.0.0
 //
