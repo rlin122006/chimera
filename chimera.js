@@ -11,8 +11,8 @@
 
 (async function () {
     "use strict";
-    await new Promise(resolve => setTimeout(resolve, 4000));
     while (true) {
+        await new Promise(resolve => setTimeout(resolve, 4000));
         const scripts = document.querySelectorAll("script");
 
         for (const script of scripts) {
@@ -20,38 +20,27 @@
                 continue;
             }
 
-            const object = script.parentElement;
+            const parentObject = script.parentElement;
 
-            const inputs = object.querySelectorAll(
+            const inputs = Array.from(parentObject.querySelectorAll(
                 'input[aria-label="answer"]'
-            );
+            ));
 
             const raw = script.textContent;
-            const answers = extractStrings(raw);
+            const answers = extractAnswers(raw);
 
-            for (const input of inputs) {
-                if (input.disabled) {
-                    continue;
-                }
-
-                for (const answer of answers) {
-                    if (input.disabled) {
-                      break;
-                    }
-
-                    if(!answer) {
-                        continue;
-                    }
-
-                    enterAnswer(input, answer)
-                    await submitAnswer(input);
-                }
-            }
+            await Promise.all(
+                inputs
+                    .filter(input => !input.disabled)
+                    .map(async input => {
+                        await processInput(input, answers);
+                    })
+            );
         }
     }
 
     // extract answers into an array
-    function extractStrings(raw) {
+    function extractAnswers(raw) {
         const marker = "\\answer";
         const answers = [];
 
@@ -93,18 +82,34 @@
         return answers;
     }
 
+    // handle each input found
+    async function processInput(input, answers) {
+        for (const answer of answers) {
+            if (input.disabled) {
+                break;
+            }
+
+            if(!answer) {
+                continue;
+            }
+
+            enterAnswer(input, answer)
+            await submitAnswer(input);
+        }
+    }
+
     // put answer into input
-    function enterAnswer(element, answer) {
-        element.value = answer;
+    function enterAnswer(input, answer) {
+        input.value = answer;
         // tell webpage input was updated
-        element.dispatchEvent(new Event("input", {
+        input.dispatchEvent(new Event("input", {
             bubbles: true
         }));
     }
 
     // hit answer button and allow webpage to register
-    async function submitAnswer(element) {
-        const button = element.closest(".input-group")
+    async function submitAnswer(input) {
+        const button = input.closest(".input-group")
             .querySelector(".btn-ximera-submit");
         const form = button.form;
 
