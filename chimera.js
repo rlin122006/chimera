@@ -13,6 +13,15 @@
     "use strict";
     while (true) {
         await new Promise(resolve => setTimeout(resolve, 4000));
+
+        await Promise.all([
+            processForms(),
+            processCheckboxes()
+        ]);
+    }
+
+    // complete form questions
+    async function processForms() {
         const scripts = document.querySelectorAll("script");
 
         for (const script of scripts) {
@@ -21,7 +30,6 @@
             }
 
             const parentObject = script.parentElement;
-
             const inputs = Array.from(parentObject.querySelectorAll(
                 'input[aria-label="answer"]'
             ));
@@ -36,6 +44,28 @@
                         await processInput(input, answers);
                     })
             );
+        }
+    }
+
+    // complete checkbox problems
+    async function processCheckboxes() {
+        const spans = document.querySelectorAll("span");
+
+        for (const span of spans) {
+            if (!span.matches(".choice.correct")) {
+                continue;
+            }
+
+            const button = span.closest("button");
+
+            button.click();
+
+            await new Promise(resolve => setTimeout(resolve, 2000));
+
+            const choiceGroup = button.closest(".btn-group-vertical");
+            const submit = choiceGroup.parentElement.querySelector(".btn-ximera-submit");
+
+            submit.click();
         }
     }
 
@@ -93,31 +123,23 @@
                 continue;
             }
 
-            enterAnswer(input, answer)
-            await submitAnswer(input);
+            input.value = answer;
+
+            // tell webpage input was updated
+            input.dispatchEvent(new Event("input", {
+                bubbles: true
+            }));
+
+            const button = input.closest(".input-group")
+                .querySelector(".btn-ximera-submit");
+            const form = button.form;
+
+            form.addEventListener("submit", event => {
+                event.preventDefault();
+            });
+
+            button.click();
+            await new Promise(resolve => setTimeout(resolve, 2000));
         }
-    }
-
-    // put answer into input
-    function enterAnswer(input, answer) {
-        input.value = answer;
-        // tell webpage input was updated
-        input.dispatchEvent(new Event("input", {
-            bubbles: true
-        }));
-    }
-
-    // hit answer button and allow webpage to register
-    async function submitAnswer(input) {
-        const button = input.closest(".input-group")
-            .querySelector(".btn-ximera-submit");
-        const form = button.form;
-
-        form.addEventListener("submit", event => {
-            event.preventDefault();
-        });
-
-        button.click();
-        await new Promise(resolve => setTimeout(resolve, 2000));
     }
 })();
