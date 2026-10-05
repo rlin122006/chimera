@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name        chimera-dev
+// @name        chimera
 // @namespace   Violentmonkey Scripts
 // @version     1.2.0
 //
@@ -11,18 +11,15 @@
 
 (async function () {
     "use strict";
-    // script start
+    // ==script start==
     await new Promise(resolve => setTimeout(resolve, 4000));
-
     await Promise.all([
         processForms(),
         processCheckboxes(),
     ]);
-
     await new Promise(resolve => setTimeout(resolve, 4000));
     nextPage();
-    // script ends
-
+    // ==script ends==
 
     // complete form questions
     async function processForms() {
@@ -150,7 +147,6 @@
     // finds and clicks next page button
     function nextPage() {
         const hyperlink = document.querySelector("a.page-link.pulsate");
-
         hyperlink.click();
     }
 })();
