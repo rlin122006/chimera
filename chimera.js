@@ -1,7 +1,7 @@
 // ==UserScript==
-// @name        chimera
+// @name        chimera-dev
 // @namespace   Violentmonkey Scripts
-// @version     1.0.0
+// @version     1.2.0
 //
 // @match       *://ximera.osu.edu/*
 // @grant       none
@@ -11,14 +11,18 @@
 
 (async function () {
     "use strict";
-    while (true) {
-        await new Promise(resolve => setTimeout(resolve, 4000));
+    // script start
+    await new Promise(resolve => setTimeout(resolve, 4000));
 
-        await Promise.all([
-            processForms(),
-            processCheckboxes()
-        ]);
-    }
+    await Promise.all([
+        processForms(),
+        processCheckboxes(),
+    ]);
+
+    await new Promise(resolve => setTimeout(resolve, 4000));
+    nextPage();
+    // script ends
+
 
     // complete form questions
     async function processForms() {
@@ -141,5 +145,12 @@
             button.click();
             await new Promise(resolve => setTimeout(resolve, 2000));
         }
+    }
+
+    // finds and clicks next page button
+    function nextPage() {
+        const hyperlink = document.querySelector("a.page-link.pulsate");
+
+        hyperlink.click();
     }
 })();
