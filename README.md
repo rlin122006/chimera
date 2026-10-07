@@ -22,6 +22,8 @@ Using this script requires a userscript manager extension like Violentmonkey. Th
 
 On Violentmonkey, the plus symbol can be selected and "new from file" can be used to select the downloaded Javascript file. Make sure the script is enabled, and it will run automatically on specific web pages within the browser. You can disable it anytime by clicking on the extension and toggling.
 
+Any times when the application fails to fill out any form or multiple choice input please feel free to contact me. If you know who I am in person is fine and or you can submit an issue to this repository.
+
 ## License
 
 This project is licensed under the MIT License.
