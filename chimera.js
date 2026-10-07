@@ -1,7 +1,7 @@
 // ==UserScript==
-// @name        chimera-dev
+// @name        chimera
 // @namespace   Violentmonkey Scripts
-// @version     2.0.0
+// @version     2.1.0
 //
 // @match       *://ximera.osu.edu/*
 // @grant       none
