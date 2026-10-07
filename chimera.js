@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name        chimera
+// @name        chimera-dev
 // @namespace   Violentmonkey Scripts
 // @version     2.0.0
 //
@@ -73,7 +73,7 @@
     // extract answers into an array
     function extractAnswers(raw) {
         const marker = "\\answer";
-        const answers = [];
+        const rawAnswers = [];
 
         let searchStart = 0;
 
@@ -100,7 +100,7 @@
                     depth--;
 
                     if (depth === 0) {
-                        answers.push(
+                        rawAnswers.push(
                             raw.slice(openBrace + 1, i).trim()
                         );
 
@@ -110,7 +110,64 @@
                 }
             }
         }
+        const answers = sanitizeAnswers(rawAnswers);
         return answers;
+    }
+
+    // sanitize answers (scalable)
+    function sanitizeAnswers(rawAnswers) {
+        const caret = new RegExp("\\^");
+        const answers = [];
+
+        for (const rawAnswer of rawAnswers) {
+            let answer = rawAnswer;
+
+            if (caret.test(answer) ) {
+                answer = sanitizeExponents(answer);
+            }
+            answers.push(answer);
+        }
+        return answers;
+    }
+
+    // use depth counting to remove outer brackets
+    function sanitizeExponents(answer) {
+        let result = "";
+    
+        for (let i = 0; i < answer.length; i++) {
+            if (answer[i] === "^" && answer[i + 1] === "{") {
+                result += "^(";
+                i += 2;
+
+                let depth = 1;
+
+                while (i < answer.length && depth > 0) {
+                    if (answer[i] === "{") {
+                        depth++;
+                        result += answer[i];
+                    } 
+                    else if (answer[i] === "}") {
+                        depth--;
+
+                        if (depth === 0) {
+                            result += ")";
+                        } else {
+                            result += answer[i];
+                        }
+                    } 
+                    else {
+                        result += answer[i];
+                    }
+
+                    i++;
+                }
+
+                i--;
+            } else {
+                result += answer[i];
+            }
+        }
+        return result;
     }
 
     // handle each input found
