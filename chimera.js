@@ -12,12 +12,12 @@
 (async function () {
     "use strict";
     // ==script start==
-    await new Promise(resolve => setTimeout(resolve, 4000));
+    await new Promise(resolve => setTimeout(resolve, 2000));
     await Promise.all([
         processForms(),
         processCheckboxes(),
     ]);
-    await new Promise(resolve => setTimeout(resolve, 4000));
+    await new Promise(resolve => setTimeout(resolve, 1000));
     nextPage();
     // ==script ends==
 
@@ -202,7 +202,8 @@
     }
 
     // finds and clicks next page button
-    function nextPage() {
+    async function nextPage() {
+        await new Promise(resolve => setTimeout(resolve, 1000));
         const hyperlink = document.querySelector("a.page-link.pulsate");
         hyperlink.click();
     }
